@@ -267,7 +267,7 @@ def updateUniqueFileId_ifBad(lastValue):
         global uniqueFileId_value
         print(f"{BRIGHT_RED}Last program safety was found Off.{RESET}")
         p()
-        uniqueFileId_value += 10000
+        uniqueFileId_value += 100
         writeToUniqueFileId(uniqueFileId_value)
 
 #funcs
@@ -355,13 +355,14 @@ def renameFile_getCommand(fileName):
         cmdList_values[tVar1] = "".join(stringObject_list)
     #copying and renaming files
     for activeIndex in range(len(cmdList_keys)):
+        uniqueFileId_value+=1
+        writeToUniqueFileId(uniqueFileId_value)
         if len(cmdList_values[activeIndex]) <= 190:
             fileExtension = fileName.rsplit(".")
             fileExtension = fileExtension[1]
             newFileName = cmdList_values[activeIndex] + " - (" + str(uniqueFileId_value) + ")." + fileExtension
             newFolderAddressKey = cmdList_keys[activeIndex]
             #copying and renaming the file
-            uniqueFileId_value+=1
             shutil.copy(os.path.join(path_masterFolder, fileName), os.path.join(folderAddressList[newFolderAddressKey], newFileName))
             #sending the user command to the csv database
             dataToSend = {"Original Name":[fileName], "New Name":[newFileName], "Folder Key":[newFolderAddressKey], "Folder Address":[folderAddressList[newFolderAddressKey][15:]], "Has a text file":["No"], "Date":[dateNow], "Time":[timeNow]}
@@ -374,7 +375,6 @@ def renameFile_getCommand(fileName):
             newFileName_forTextFile = "Z as [" + cmdList_values[activeIndex][0:180] + "]... - (" + str(uniqueFileId_value) + ").txt"
             newFolderAddressKey = cmdList_keys[activeIndex]
             #copying and renaming the file
-            uniqueFileId_value+=1
             shutil.copy(os.path.join(path_masterFolder, fileName), os.path.join(folderAddressList[newFolderAddressKey], newFileName))
             #creating the new text file
             txtFileObject = open(os.path.join(folderAddressList[newFolderAddressKey], newFileName_forTextFile), "wt", encoding="utf-8")
@@ -402,7 +402,6 @@ if __name__ == "__main__":
     
     #ending
     readAndWriteTo_programSafety(1)
-    writeToUniqueFileId(uniqueFileId_value)
     input("Finished. Press enter to exit.")
     pyautogui.moveTo(1282, 22)
     pyautogui.click()
