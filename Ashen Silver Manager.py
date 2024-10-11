@@ -177,8 +177,8 @@ folderAddressList = {
     '32R' : r"D:\Ashen Silver\More\ReCheck R9",
     '33R' : r"D:\Ashen Silver\More\NonAS R9",
     '34R' : r"D:\Ashen Silver\More\Del",
-    '35R' : r"D:\Ashen Silver\R9\5 c Body Shape R",
-    '36R' : r"D:\Ashen Silver\R9\5 c Camera Position R",
+    '35R' : r"D:\Ashen Silver\R9\5 c Body Shape",
+    '36R' : r"D:\Ashen Silver\R9\5 c Camera Position",
     '99R' : r"D:\Ashen Silver\More\The Great Library R9",
 }
 
@@ -323,17 +323,17 @@ def renameFile_getCommand(fileName):
     #updating lists
     tVar3 = True
     if isR:
-        if (cmdList_keys == ["32R"]):
+        if ("32R" in cmdList_keys):
             tVar3 = False
-        if (cmdList_keys == ["34R"]):
+        if ("34R" in cmdList_keys):
             tVar3 = False
         if tVar3:
             cmdList_keys.append("99R")
             cmdList_values.append("Nyan")
     else:
-        if (cmdList_keys == ["32"]):
+        if ("32" in cmdList_keys):
             tVar3 = False
-        if (cmdList_keys == ["34"]):
+        if ("34" in cmdList_keys):
             tVar3 = False
         if tVar3:
             cmdList_keys.append("99")
