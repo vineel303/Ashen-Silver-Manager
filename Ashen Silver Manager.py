@@ -365,7 +365,7 @@ def renameFile_getCommand(fileName):
             #copying and renaming the file
             shutil.copy(os.path.join(path_masterFolder, fileName), os.path.join(folderAddressList[newFolderAddressKey], newFileName))
             #sending the user command to the csv database
-            dataToSend = {"Original Name":[fileName], "New Name":[newFileName], "Folder Key":[newFolderAddressKey], "Folder Address":[folderAddressList[newFolderAddressKey][15:]], "Has a text file":["No"], "Date":[dateNow], "Time":[timeNow]}
+            dataToSend = {"Original Name":[fileName], "New Name":[newFileName], "Folder Key":[newFolderAddressKey], "Folder Address":[folderAddressList[newFolderAddressKey][15:]], "Has Z":["No"], "Date":[dateNow], "Time":[timeNow]}
             dataToSend_dataFrom = pandas.DataFrame(dataToSend)
             dataToSend_dataFrom.to_csv(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History.csv", mode="a", header=False, index=False)
         else:
@@ -381,7 +381,7 @@ def renameFile_getCommand(fileName):
             txtFileObject.write(cmdList_values[activeIndex])
             txtFileObject.close()
             #sending the user command to the csv database
-            dataToSend = {"Original Name":[fileName], "New Name":[newFileName], "Folder Key":[newFolderAddressKey], "Folder Address":[folderAddressList[newFolderAddressKey][15:]], "Has a text file":["Yes"], "Date":[dateNow], "Time":[timeNow]}
+            dataToSend = {"Original Name":[fileName], "New Name":[newFileName], "Folder Key":[newFolderAddressKey], "Folder Address":[folderAddressList[newFolderAddressKey][15:]], "Has Z":["Yes"], "Date":[dateNow], "Time":[timeNow]}
             dataToSend_dataFrom = pandas.DataFrame(dataToSend)
             dataToSend_dataFrom.to_csv(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History.csv", mode="a", header=False, index=False)
 
