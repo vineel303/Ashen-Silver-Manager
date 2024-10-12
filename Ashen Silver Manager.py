@@ -6,8 +6,8 @@ import subprocess
 import pygetwindow
 import pyautogui
 import shutil
-import pandas
 from datetime import datetime
+import pandas
 
 #simple system constants
 RESET = "\033[0m"
@@ -25,176 +25,188 @@ BRIGHT_RED = BRIGHT + RED
 BRIGHT_YELLOW = BRIGHT + YELLOW
 BRIGHT_GREEN = BRIGHT + GREEN
 BRIGHT_BLUE = BRIGHT + BLUE
+BRIGHT_MAGENTA = BRIGHT + MAGENTA
+BRIGHT_CYAN = BRIGHT + CYAN
 
-#program variables
-filesInMasterFolder = []
+#large program constants
+introStatement = f"""Artwork:
+    {BRIGHT_RED}1. Camera's Position & Angle{RESET}
+    A. Backdrops:
+        {BRIGHT_RED}2. Objects
+        3. Backdrops{RESET}
+    B. Characters
+        {BRIGHT_RED}4. Clothes
+        5. Accessories
+        6. Expressions
+        7. Posture
+        8. Face
+            > Eyes
+            > Hair
+        9. Body
+            > Bust-Waist-Hips{RESET}
+Artist:
+    {BRIGHT_RED}1. Colour
+    2. Unique Art Style
+    3. Novel Related Ideas{RESET}
+
+Look:
+    {BRIGHT_RED}1. Favourite
+    2. Good{RESET}
+Draw:
+    {BRIGHT_RED}1. Recheck
+    2. None{RESET}
+
+{BRIGHT}--- --- ---{RESET}
+
+1. {BRIGHT_YELLOW}Backdrop Elements{RESET}: Elements of a backdrop (like trees and clouds in a mountain backdrop).
+2. {BRIGHT_YELLOW}Object vs Accessories{RESET}: Any object that a character is wearing/holding is an accessory, irrespective of size.
+3. {BRIGHT_YELLOW}Eyes/Hair{RESET}: Colour & Unique Art Style
+4. {BRIGHT_YELLOW}Posture wrt{RESET}: Character/s, Object/s, Backdrop/s, Camera.
+5. {BRIGHT_YELLOW}Characters/Backdrops{RESET}: Upto few {DIM}(like day meeting night, or summer meeting winter){RESET}.
+6. {BRIGHT_YELLOW}Accessories/Objects/Backdrop Elements{RESET}: Upto many. Small/big (in size). Unique or generic (in value).
+"""
+
+helpStatement = f"""{BRIGHT_RED}00{RESET} : Objects      | b
+0{BRIGHT_RED}1{RESET} : Backdrops    | b
+0{BRIGHT_RED}2{RESET} : Accessories  | +
+0{BRIGHT_RED}3{RESET} : Clothes      | +
+0{BRIGHT_RED}4{RESET} : Faces        | c
+0{BRIGHT_RED}5{RESET} : Expressions  | c
+0{BRIGHT_RED}6{RESET} : Postures     | c
+0{BRIGHT_RED}7{RESET} : Colours      | g
+0{BRIGHT_RED}8{RESET} : Uni-AS       | g
+0{BRIGHT_RED}9{RESET} : NV           | g
+
+Start with '{BRIGHT_RED}/ & Enter{RESET}' for R images.
+{BRIGHT_RED}1{RESET}0 : 2 Objects    | b
+{BRIGHT_RED}2{RESET}0 : 3 Objects    | b
+Face #: {BRIGHT_RED}E{RESET}yes {BRIGHT_RED}H{RESET}air {BRIGHT_RED}C{RESET}olour {BRIGHT_RED}S{RESET}tyle.
+
+{BRIGHT_RED}30{RESET} : Grade A      | v
+{BRIGHT_RED}31{RESET} : Grade B      | v
+{BRIGHT_RED}32{RESET} : Recheck      | a
+{BRIGHT_RED}33{RESET} : Non-AS       | a
+{BRIGHT_RED}34{RESET} : Delete       | a
+{BRIGHT_RED}35{RESET} : Body Shapes  | c
+{BRIGHT_RED}36{RESET} : Camera P/A   | c
+"""
+
+folderAddressList = {
+
+    #g0
+    "00" : r"D:\Ashen Silver\1b Objects",
+    "01" : r"D:\Ashen Silver\1b Backdrops",
+    "02" : r"D:\Ashen Silver\1c Accessories",
+    "03" : r"D:\Ashen Silver\1c Clothes",
+    "04" : r"D:\Ashen Silver\1c Faces",
+    "05" : r"D:\Ashen Silver\1c Expressions",
+    "06" : r"D:\Ashen Silver\1c Postures",
+    "07" : r"D:\Ashen Silver\1g Colours",
+    "08" : r"D:\Ashen Silver\1g UniAS",
+    "09" : r"D:\Ashen Silver\1g NV",
+
+    #g1
+    "10" : r"D:\Ashen Silver\2b Objects",
+    "11" : r"D:\Ashen Silver\2b Backdrops",
+    "12" : r"D:\Ashen Silver\2c Accessories",
+    "13" : r"D:\Ashen Silver\2c Clothes",
+    "14" : r"D:\Ashen Silver\2c Faces",
+    "15" : r"D:\Ashen Silver\2c Expressions",
+    "16" : r"D:\Ashen Silver\2c Postures",
+    "17" : r"D:\Ashen Silver\2g Colours",
+    "18" : r"D:\Ashen Silver\2g UniAS",
+    "19" : r"D:\Ashen Silver\2g NV",
+
+    #g2
+    "20" : r"D:\Ashen Silver\3b Objects",
+    "21" : r"D:\Ashen Silver\3b Backdrops",
+    "22" : r"D:\Ashen Silver\3c Accessories",
+    "23" : r"D:\Ashen Silver\3c Clothes",
+    "24" : r"D:\Ashen Silver\3c Faces",
+    "25" : r"D:\Ashen Silver\3c Expressions",
+    "26" : r"D:\Ashen Silver\3c Postures",
+    "27" : r"D:\Ashen Silver\3g Colours",
+    "28" : r"D:\Ashen Silver\3g UniAS",
+    "29" : r"D:\Ashen Silver\3g NV",
+
+    #r0
+    "00R" : r"D:\Ashen Silver\R\1b Objects",
+    "01R" : r"D:\Ashen Silver\R\1b Backdrops",
+    "02R" : r"D:\Ashen Silver\R\1c Accessories",
+    "03R" : r"D:\Ashen Silver\R\1c Clothes",
+    "04R" : r"D:\Ashen Silver\R\1c Faces",
+    "05R" : r"D:\Ashen Silver\R\1c Expressions",
+    "06R" : r"D:\Ashen Silver\R\1c Postures",
+    "07R" : r"D:\Ashen Silver\R\1g Colours",
+    "08R" : r"D:\Ashen Silver\R\1g UniAS",
+    "09R" : r"D:\Ashen Silver\R\1g NV",
+
+    #r1
+    "10R" : r"D:\Ashen Silver\R\2b Objects",
+    "11R" : r"D:\Ashen Silver\R\2b Backdrops",
+    "12R" : r"D:\Ashen Silver\R\2c Accessories",
+    "13R" : r"D:\Ashen Silver\R\2c Clothes",
+    "14R" : r"D:\Ashen Silver\R\2c Faces",
+    "15R" : r"D:\Ashen Silver\R\2c Expressions",
+    "16R" : r"D:\Ashen Silver\R\2c Postures",
+    "17R" : r"D:\Ashen Silver\R\2g Colours",
+    "18R" : r"D:\Ashen Silver\R\2g UniAS",
+    "19R" : r"D:\Ashen Silver\R\2g NV",
+
+    #r2
+    "20R" : r"D:\Ashen Silver\R\3b Objects",
+    "21R" : r"D:\Ashen Silver\R\3b Backdrops",
+    "22R" : r"D:\Ashen Silver\R\3c Accessories",
+    "23R" : r"D:\Ashen Silver\R\3c Clothes",
+    "24R" : r"D:\Ashen Silver\R\3c Faces",
+    "25R" : r"D:\Ashen Silver\R\3c Expressions",
+    "26R" : r"D:\Ashen Silver\R\3c Postures",
+    "27R" : r"D:\Ashen Silver\R\3g Colours",
+    "28R" : r"D:\Ashen Silver\R\3g UniAS",
+    "29R" : r"D:\Ashen Silver\R\3g NV",
+
+    #g3
+    "30" : r"D:\Ashen Silver\More\Grade A",
+    "31" : r"D:\Ashen Silver\More\Grade B",
+    "32" : r"D:\Ashen Silver\More\ReCheck",
+    "33" : r"D:\Ashen Silver\More\NonAS",
+    "34" : r"D:\Ashen Silver\More\Delete",
+    "35" : r"D:\Ashen Silver\5c Body Shapes",
+    "36" : r"D:\Ashen Silver\5c Camera",
+    "99" : r"D:\Ashen Silver\More\Great Library",
+
+    #r3
+    "30R" : r"D:\Ashen Silver\More\Grade A R",
+    "31R" : r"D:\Ashen Silver\More\Grade B R",
+    "32R" : r"D:\Ashen Silver\More\ReCheck R",
+    "33R" : r"D:\Ashen Silver\More\NonAS R",
+    "34R" : r"D:\Ashen Silver\More\Delete",
+    "35R" : r"D:\Ashen Silver\R\5c Body Shapes",
+    "36R" : r"D:\Ashen Silver\R\5c Camera",
+    "99R" : r"D:\Ashen Silver\More\Great Library R",
+
+}
 
 #small program constants
 path_masterFolder = r"D:\Ashen Silver\More\Master"
-
-#large program constants
-#lpc
-fullHelp_statement = f"""Elements:
-    {BRIGHT_YELLOW}1. The camera's position{RESET}
-    Non-living:
-        {BRIGHT_YELLOW}2A. Scenery{RESET}{DIM} - Includes generic elements (like several normal trees, a normal river), and unique elements (like several white-leafed trees, a glowing river).{RESET}
-        {BRIGHT_YELLOW}2B. Objects{RESET}{DIM} - Includes generic elements (like books, a phone), and unique elements (like black-paged books, a transparent phone).{RESET}
-    Living:
-        {BRIGHT_YELLOW}3A. Clothes{RESET}
-        {BRIGHT_YELLOW}3B. Accessories{RESET} {DIM}- Includes small elements (like hair scrunchies), and big elements (like a school bag, a football in one's arms).{RESET}
-        Face:
-            {BRIGHT_YELLOW}3C1. Expression{RESET}
-            {BRIGHT_YELLOW}3C2. Face{RESET}:
-                {BRIGHT_YELLOW}> Eyes{RESET}{DIM} - Colour/Shape{RESET}
-                {BRIGHT_YELLOW}> Hair{RESET}{DIM} - Colour/Shape{RESET}
-        Body:
-            {BRIGHT_YELLOW}3D1. Posture{RESET}{DIM} - wrt: another human/s, an object/s, the scenery, the camera.{RESET}
-            {BRIGHT_YELLOW}3D2. Body{RESET}:
-                {BRIGHT_YELLOW}> Bust-waist-hips{RESET}
-Artist:
-    {BRIGHT_YELLOW}Colours{RESET}
-    {BRIGHT_YELLOW}Unique Art Style{RESET}
-    {BRIGHT_YELLOW}Novel related ideas{RESET}
---- --- ---
-Anime:
-    {BRIGHT_YELLOW}Favourites{RESET}
-    {BRIGHT_YELLOW}Good{RESET}
-    {BRIGHT_YELLOW}The great library{RESET}
-Ashen Silver:
-    {BRIGHT_YELLOW}Delete{RESET}
-    {BRIGHT_YELLOW}None{RESET}
-    {BRIGHT_YELLOW}Rescan{RESET}
-
-{DIM}(Scroll up for help.){RESET}
-"""
-
-#lpc
-help_statement = f"""{BRIGHT_BLUE}00{RESET} : Objects          (b)
-0{BRIGHT_BLUE}1{RESET} : Scenery          (b)
-0{BRIGHT_BLUE}2{RESET} : Accessories      (+)
-0{BRIGHT_BLUE}3{RESET} : Clothing         (+)
-0{BRIGHT_BLUE}4{RESET} : Faces            (c)
-0{BRIGHT_BLUE}5{RESET} : Expressions      (c)
-0{BRIGHT_BLUE}6{RESET} : Posture          (c)
-0{BRIGHT_BLUE}7{RESET} : Colours          (g)
-0{BRIGHT_BLUE}8{RESET} : Uni-AS           (g)
-0{BRIGHT_BLUE}9{RESET} : NV               (g)
-
-Start with '{BRIGHT_BLUE}/{RESET}' for R images
-{BRIGHT_BLUE}1{RESET}0 : 2 Objects        (b)
-{BRIGHT_BLUE}2{RESET}0 : 3 Objects        (b)
-Face: # {BRIGHT_BLUE}E{RESET}yes {BRIGHT_BLUE}H{RESET}air {BRIGHT_BLUE}C{RESET}olour {BRIGHT_BLUE}S{RESET}hape
-
-{BRIGHT_BLUE}30{RESET} : Grade A          (V)
-{BRIGHT_BLUE}31{RESET} : Grade B          (V)
-{BRIGHT_BLUE}32{RESET} : Recheck          (a)
-{BRIGHT_BLUE}33{RESET} : Non-AS           (a)
-{BRIGHT_BLUE}34{RESET} : Delete           (a)
-{BRIGHT_BLUE}35{RESET} : Body shape       (c)
-{BRIGHT_BLUE}36{RESET} : Camera position  (c)
-"""
-
-#lpc
-folderAddressList = {
-    #G0
-    '00' : r"D:\Ashen Silver\1 b Objects",
-    '01' : r"D:\Ashen Silver\1 b Scenery",
-    '02' : r"D:\Ashen Silver\1 c Accessories",
-    '03' : r"D:\Ashen Silver\1 c Clothing",
-    '04' : r"D:\Ashen Silver\1 c Faces",
-    '05' : r"D:\Ashen Silver\1 c Expressions",
-    '06' : r"D:\Ashen Silver\1 c Posture",
-    '07' : r"D:\Ashen Silver\1 g Colours",
-    '08' : r"D:\Ashen Silver\1 g UniAS",
-    '09' : r"D:\Ashen Silver\1 g NV",
-    #G1
-    '10' : r"D:\Ashen Silver\2 b Objects",
-    '11' : r"D:\Ashen Silver\2 b Scenery",
-    '12' : r"D:\Ashen Silver\2 c Accessories",
-    '13' : r"D:\Ashen Silver\2 c Clothing",
-    '14' : r"D:\Ashen Silver\2 c Faces",
-    '15' : r"D:\Ashen Silver\2 c Expressions",
-    '16' : r"D:\Ashen Silver\2 c Posture",
-    '17' : r"D:\Ashen Silver\2 g Colours",
-    '18' : r"D:\Ashen Silver\2 g UniAS",
-    '19' : r"D:\Ashen Silver\2 g NV",
-    #G2
-    '20' : r"D:\Ashen Silver\3 b Objects",
-    '21' : r"D:\Ashen Silver\3 b Scenery",
-    '22' : r"D:\Ashen Silver\3 c Accessories",
-    '23' : r"D:\Ashen Silver\3 c Clothing",
-    '24' : r"D:\Ashen Silver\3 c Faces",
-    '25' : r"D:\Ashen Silver\3 c Expressions",
-    '26' : r"D:\Ashen Silver\3 c Posture",
-    '27' : r"D:\Ashen Silver\3 g Colours",
-    '28' : r"D:\Ashen Silver\3 g UniAS",
-    '29' : r"D:\Ashen Silver\3 g NV",
-    #R0
-    '00R' : r"D:\Ashen Silver\R9\1 b Objects",
-    '01R' : r"D:\Ashen Silver\R9\1 b Scenery",
-    '02R' : r"D:\Ashen Silver\R9\1 c Accessories",
-    '03R' : r"D:\Ashen Silver\R9\1 c Clothing",
-    '04R' : r"D:\Ashen Silver\R9\1 c Faces",
-    '05R' : r"D:\Ashen Silver\R9\1 c Expressions",
-    '06R' : r"D:\Ashen Silver\R9\1 c Posture",
-    '07R' : r"D:\Ashen Silver\R9\1 g Colours",
-    '08R' : r"D:\Ashen Silver\R9\1 g UniAS",
-    '09R' : r"D:\Ashen Silver\R9\1 g NV",
-    #R1
-    '10R' : r"D:\Ashen Silver\R9\2 b Objects",
-    '11R' : r"D:\Ashen Silver\R9\2 b Scenery",
-    '12R' : r"D:\Ashen Silver\R9\2 c Accessories",
-    '13R' : r"D:\Ashen Silver\R9\2 c Clothing",
-    '14R' : r"D:\Ashen Silver\R9\2 c Faces",
-    '15R' : r"D:\Ashen Silver\R9\2 c Expressions",
-    '16R' : r"D:\Ashen Silver\R9\2 c Posture",
-    '17R' : r"D:\Ashen Silver\R9\2 g Colours",
-    '18R' : r"D:\Ashen Silver\R9\2 g UniAS",
-    '19R' : r"D:\Ashen Silver\R9\2 g NV",
-    #R2
-    '20R' : r"D:\Ashen Silver\R9\3 b Objects",
-    '21R' : r"D:\Ashen Silver\R9\3 b Scenery",
-    '22R' : r"D:\Ashen Silver\R9\3 c Accessories",
-    '23R' : r"D:\Ashen Silver\R9\3 c Clothing",
-    '24R' : r"D:\Ashen Silver\R9\3 c Faces",
-    '25R' : r"D:\Ashen Silver\R9\3 c Expressions",
-    '26R' : r"D:\Ashen Silver\R9\3 c Posture",
-    '27R' : r"D:\Ashen Silver\R9\3 g Colours",
-    '28R' : r"D:\Ashen Silver\R9\3 g UniAS",
-    '29R' : r"D:\Ashen Silver\R9\3 g NV",
-    #G3
-    '30' : r"D:\Ashen Silver\More\Grade A",
-    '31' : r"D:\Ashen Silver\More\Grade B",
-    '32' : r"D:\Ashen Silver\More\ReCheck",
-    '33' : r"D:\Ashen Silver\More\NonAS",
-    '34' : r"D:\Ashen Silver\More\Del",
-    '35' : r"D:\Ashen Silver\5 c Body Shape",
-    '36' : r"D:\Ashen Silver\5 c Camera Position",
-    '99' : r"D:\Ashen Silver\More\The Great Library",
-    #R3
-    '30R' : r"D:\Ashen Silver\More\Grade A R9",
-    '31R' : r"D:\Ashen Silver\More\Grade B R9",
-    '32R' : r"D:\Ashen Silver\More\ReCheck R9",
-    '33R' : r"D:\Ashen Silver\More\NonAS R9",
-    '34R' : r"D:\Ashen Silver\More\Del",
-    '35R' : r"D:\Ashen Silver\R9\5 c Body Shape",
-    '36R' : r"D:\Ashen Silver\R9\5 c Camera Position",
-    '99R' : r"D:\Ashen Silver\More\The Great Library R9",
-}
-
 keysIn_folderAddressList = list(folderAddressList.keys())
 
-#functions
-#funcs
+#variables
+filesInMasterFolder = []
+
+#definitions
+#defs
 def p():
     print("")
 
-def getDbSize():
-    dbSize = os.path.getsize(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History.csv")
-    if dbSize>50000000:
-        print(f"{BRIGHT_RED}Size of 'User's Command History.csv' is over 50 MB.{RESET}")
-        p()
+def characterUpdater(character):
+    inputCharacter  = ['/', '\\', '|', '?', '<', '>', '*', '"', ':']
+    outputCharacter = ['Ⳇ', '⧵', '|', 'Ɂ', '˂', '˃', '⁎', "''", '։']
+    if character in inputCharacter:
+        return outputCharacter[inputCharacter.index(character)]
+    return character
 
+#defs
 def addFilesTo_filesInMasterFolder():
     global path_masterFolder
     global filesInMasterFolder
@@ -203,16 +215,16 @@ def addFilesTo_filesInMasterFolder():
             filesInMasterFolder.append(fileName)
     filesInMasterFolder = natsorted(filesInMasterFolder)
 
-#funcs
+#defs
 def allWindowSetup(imageWindow):
     global path_masterFolder
     windowSetup_windowSnap(r"C:\Users\vinee\AppData\Local\Programs\Python\Launcher\py.exe", "right")
     time.sleep(0.5)
-    subprocess.run(['start', '', os.path.join(path_masterFolder, imageWindow)], shell=True)
+    subprocess.run(['start', os.path.join(path_masterFolder, imageWindow)], shell=True)
     time.sleep(0.5)
     windowSetup_windowSnap(imageWindow, "left")
     windowSetup_windowSnapReposition()
-
+    
 def windowSetup_windowSnap(windowName, position):
     windowObject = pygetwindow.getWindowsWithTitle(windowName)
     if windowObject:
@@ -227,183 +239,214 @@ def windowSetup_windowSnap(windowName, position):
         windowSetup_windowSnap(windowName, position)
 
 def windowSetup_windowSnapReposition():
-    pyautogui.moveTo(960, 509)
+    pyautogui.moveTo(957, 509)
     time.sleep(0.5)
     pyautogui.mouseDown()
     pyautogui.moveTo(1600, 509, duration=0.5)
     pyautogui.mouseUp()
     pyautogui.moveTo(1892, 69)
-    pyautogui.click()
+    windowObject = pygetwindow.getWindowsWithTitle(r"C:\Users\vinee\AppData\Local\Programs\Python\Launcher\py.exe")
+    windowObject[0].activate()
 
-def gotoNextImage():
-    pyautogui.moveTo(1287, 510)
-    pyautogui.click()
-    pyautogui.moveTo(1892, 69)
-    pyautogui.click()
+def gotoNextImage(index):
+    windowObject = pygetwindow.getWindowsWithTitle(filesInMasterFolder[index])
+    windowObject[0].activate()
+    pyautogui.press('right')
+    windowObject = pygetwindow.getWindowsWithTitle(r"C:\Users\vinee\AppData\Local\Programs\Python\Launcher\py.exe")
+    windowObject[0].activate()
 
-#funcs
+def closeImageWindow(imageWindow):
+    imageWindowObject = pygetwindow.getWindowsWithTitle(imageWindow)
+    imageWindowObject[0].activate()
+    pyautogui.hotkey("alt", "f4")
+
+#defs
 def readAndWriteTo_programSafety(value):
-    programSafetyObject = open(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\Program Safety.txt", "rt")
-    programSafety_lastValue = int(programSafetyObject.read())
-    programSafetyObject.close
-    programSafetyObject = open(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\Program Safety.txt", "wt")
-    programSafetyObject.write(str(value))
-    programSafetyObject.close
-    return programSafety_lastValue
+    fileObject = open(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\Program Safety.txt", "rt")
+    value_lastProgramSafety = int(fileObject.read())
+    fileObject.close
+    fileObject = open(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\Program Safety.txt", "wt")
+    fileObject.write(str(value))
+    fileObject.close
+    return value_lastProgramSafety
 
 def readUniqueFileId():
-    uniqueFileIdObject = open(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\Unique File ID.txt", "rt")
-    uniqueFileId_lastValue = int(uniqueFileIdObject.read())
-    uniqueFileIdObject.close
-    return uniqueFileId_lastValue
-
+    fileObject = open(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\Unique File ID.txt", "rt")
+    value_uniqueFileID = int(fileObject.read())
+    fileObject.close()
+    return value_uniqueFileID
+    
 def writeToUniqueFileId(value):
-    uniqueFileIdObject = open(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\Unique File ID.txt", "wt")
-    uniqueFileIdObject.write(str(value))
-    uniqueFileIdObject.close
+    fileObject = open(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\Unique File ID.txt", "wt")
+    fileObject.write(str(value))
+    fileObject.close()
 
-def updateUniqueFileId_ifBad(lastValue):
-    if lastValue==0:
-        global uniqueFileId_value
-        print(f"{BRIGHT_RED}Last program safety was found Off.{RESET}")
-        p()
-        uniqueFileId_value += 100
-        writeToUniqueFileId(uniqueFileId_value)
+def uniqueFileID_repair(value):
+    if value == 0:
+        global value_uniqueFileID
+        value_uniqueFileID+=100
+        writeToUniqueFileId(value_uniqueFileID)
 
-#funcs
-def characterUpdater(character):
-    inputCharacter = ['\\', '|', '?', '<', '>', '*', '"' , ':']
-    outputCharacter = ['∖', '|', 'Ɂ', '˂', '˃', '⁎', "''", '։']
-    if character in inputCharacter:
-        return outputCharacter[inputCharacter.index(character)]
-    return character
+def database_repair():
+    dbSize = os.path.getsize(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History - 1.csv")
+    if dbSize > 50000000:
+        os.remove(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History - 2.csv")
+        os.rename(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History - 1.csv", r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History - 2.csv")
+        shutil.copy(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\Sample.csv", r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History - 1.csv")
 
-def renameFile_getCommand(fileName):
+#defs
+def copyRenamedFile(fileIndex):
+    global value_uniqueFileID
     global path_masterFolder
-    global uniqueFileId_value
-    dateTimeNow = datetime.now()
-    dateNow = dateTimeNow.strftime("%d-%m-%Y")
-    timeNow = dateTimeNow.strftime("%H:%M:%S")
-    #printing
-    for i in range(12):
-        p()
-    print(help_statement)
-    #getting input
-    print(f"{MAGENTA}Enter: {RESET}{BRIGHT_GREEN}", end="")
-    cmd = input()
-    print(f"{RESET}\n")
-    if cmd[0]=="/":
-        isR = True
-    else:
-        isR = False
-    cmdList = cmd.split("/")
-    if isR:
-        cmdList.pop(0)
+    global filesInMasterFolder
+    global keysIn_folderAddressList
+
+    #base setup
+    #1
+    isR = False
+    inputIndex = 0
     cmdList_keys = []
     cmdList_values = []
-    #checking validity
-    for i in range(len(cmdList)):
-        if len(cmdList[i])<2:
-            print(f"{RED}'{cmdList[i]}' is too short. Retry.{RESET}")
-            renameFile_getCommand(fileName)
-        if cmdList[i][0:2] not in keysIn_folderAddressList:
-            print(f"{RED}'{cmdList[i][0:2]}' in '{cmdList[i]}' is an invalid key. Retry.{RESET}")
-            renameFile_getCommand(fileName)
-    #going to the next image
-    gotoNextImage()
-    #creating lists
-    for i in range(len(cmdList)):
-        cmdList_keysElement = cmdList[i][0:2]
-        cmdList_valuesElement = cmdList[i][2:]
-        if isR:
-            cmdList_keysElement = cmdList_keysElement + "R"
-        cmdList_valuesElement = cmdList_valuesElement.strip()
-        cmdList_keys.append(cmdList_keysElement)
-        cmdList_values.append(cmdList_valuesElement)
-    #updating lists
-    tVar3 = True
-    if isR:
-        if ("32R" in cmdList_keys):
-            tVar3 = False
-        if ("34R" in cmdList_keys):
-            tVar3 = False
-        if tVar3:
-            cmdList_keys.append("99R")
-            cmdList_values.append("Nyan")
-    else:
-        if ("32" in cmdList_keys):
-            tVar3 = False
-        if ("34" in cmdList_keys):
-            tVar3 = False
-        if tVar3:
-            cmdList_keys.append("99")
-            cmdList_values.append("Nyan")
-    #updating invalid file names
+
+    #2
     osReservedFilenames = [
     "CON", "PRN", "AUX", "NUL",
     "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
     "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
     ]
-    for tVar1 in range(len(cmdList_keys)):
-        #part 1
-        if cmdList_values[tVar1].upper() in osReservedFilenames:
-            cmdList_values[tVar1] = cmdList_values[tVar1] + "_"
-        #part 2
-        stringObject_list = list(cmdList_values[tVar1])
-        for tVar2 in range(len(stringObject_list)):
-            stringObject_list[tVar2] = characterUpdater(stringObject_list[tVar2])
-        cmdList_values[tVar1] = "".join(stringObject_list)
-    #copying and renaming files
-    for activeIndex in range(len(cmdList_keys)):
-        uniqueFileId_value+=1
-        writeToUniqueFileId(uniqueFileId_value)
-        if len(cmdList_values[activeIndex]) <= 190:
-            fileExtension = fileName.rsplit(".")
-            fileExtension = fileExtension[1]
-            newFileName = cmdList_values[activeIndex] + " - (" + str(uniqueFileId_value) + ")." + fileExtension
-            newFolderAddressKey = cmdList_keys[activeIndex]
-            #copying and renaming the file
-            shutil.copy(os.path.join(path_masterFolder, fileName), os.path.join(folderAddressList[newFolderAddressKey], newFileName))
-            #sending the user command to the csv database
-            dataToSend = {"Original Name":[fileName], "New Name":[newFileName], "Folder Key":[newFolderAddressKey], "Folder Address":[folderAddressList[newFolderAddressKey][15:]], "Has Z":["No"], "Date":[dateNow], "Time":[timeNow]}
-            dataToSend_dataFrom = pandas.DataFrame(dataToSend)
-            dataToSend_dataFrom.to_csv(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History.csv", mode="a", header=False, index=False)
+
+    #3
+    dateTimeNow = datetime.now()
+    dateNow = dateTimeNow.strftime("%d-%m-%Y")
+    timeNow = dateTimeNow.strftime("%H:%M:%S")
+
+    #printing
+    for i in range(10):
+        p()
+    print(helpStatement)
+
+    #input
+    while True:
+        
+        #getting input
+        inputIndex+=1
+        if inputIndex % 2 == 1:
+            print(f"{MAGENTA}{inputIndex}: {RESET}{BRIGHT_GREEN}", end="")
+            cmd = input()
+            print(f"{RESET}")
         else:
-            fileExtension = fileName.rsplit(".")
-            fileExtension = fileExtension[1]
-            newFileName = "Z as [" + cmdList_values[activeIndex][0:180] + "]... - (" + str(uniqueFileId_value) + ")." + fileExtension
-            newFileName_forTextFile = "Z as [" + cmdList_values[activeIndex][0:180] + "]... - (" + str(uniqueFileId_value) + ").txt"
-            newFolderAddressKey = cmdList_keys[activeIndex]
-            #copying and renaming the file
-            shutil.copy(os.path.join(path_masterFolder, fileName), os.path.join(folderAddressList[newFolderAddressKey], newFileName))
-            #creating the new text file
-            txtFileObject = open(os.path.join(folderAddressList[newFolderAddressKey], newFileName_forTextFile), "wt", encoding="utf-8")
-            txtFileObject.write(cmdList_values[activeIndex])
+            print(f"{MAGENTA}{inputIndex}: {RESET}{BRIGHT_BLUE}", end="")
+            cmd = input()
+            print(f"{RESET}")
+
+        #checking input
+        if cmd == "":
+            break
+        if cmd == "/":
+            isR = True
+        if len(cmd)<2:
+            print(f"'{cmd}' is too short. Retry")
+            continue
+        elementKey = cmd[0:2]
+        if elementKey not in keysIn_folderAddressList:
+            print(f"'{elementKey}' is not a valid key. Retry.")
+            continue
+        elementValue = cmd[2:].strip()
+        
+        #goto next image
+        gotoNextImage()
+        
+        #updating invalid file names
+        #part 1
+        if elementValue.upper in osReservedFilenames:
+            elementValue = elementValue + "_"
+        #part 2
+        stringAsList = list(elementValue)
+        for characterIndex in range(len(stringAsList)):
+            stringAsList[characterIndex] = characterUpdater(stringAsList[characterIndex])
+        elementValue = "".join(stringAsList)
+        
+        #accepting input
+        cmdList_values.append(elementValue)
+        if isR:
+            cmdList_keys.append(elementKey + "R")
+        else:
+            cmdList_keys.append(elementKey)
+    
+    #updating the lists
+    addToTheGreatLibrary = True
+    if isR:
+        if "32R" in cmdList_keys:
+            addToTheGreatLibrary=False
+        if "34R" in cmdList_keys:
+            addToTheGreatLibrary=False
+        if addToTheGreatLibrary:
+            cmdList_keys.append("99")
+            cmdList_values.append("Nyan")
+    else:
+        if "32" in cmdList_keys:
+            addToTheGreatLibrary=False
+        if "34" in cmdList_keys:
+            addToTheGreatLibrary=False
+        if addToTheGreatLibrary:
+            cmdList_keys.append("99R")
+            cmdList_values.append("Nyan")
+    
+    for cmdListIndex in range(len(cmdList_keys)):
+        value_uniqueFileID += 1
+        writeToUniqueFileId(value_uniqueFileID)
+        fileName = filesInMasterFolder[fileIndex]
+
+        if len(cmdList_values[cmdListIndex]) > 200 :
+            fileExtension = fileName.rsplit(".")[-1]
+            newFileName = cmdList_values[cmdListIndex] + " - (" + value_uniqueFileID + ")." + fileExtension
+            newFileName = "Z as [" + cmdList_values[cmdListIndex][190] + "]..." + " - (" + value_uniqueFileID + ")." + fileExtension
+            newFileName_forText = "Z as [" + cmdList_values[cmdListIndex][190] + "]..." + " - (" + value_uniqueFileID + ").txt"
+            newFolderAddressKey = cmdList_keys[cmdListIndex]
+            newAddress = keysIn_folderAddressList[newFolderAddressKey]
+            #copying and renaming the files
+            shutil.copy(os.path.join(path_masterFolder, fileName), os.path.join(newAddress, newFileName))
+            #writing to the text file
+            txtFileObject = open(os.path.join(newAddress, newFileName_forText), "wt", encoding="utf-8")
+            txtFileObject.write(cmdList_values[cmdListIndex])
             txtFileObject.close()
-            #sending the user command to the csv database
-            dataToSend = {"Original Name":[fileName], "New Name":[newFileName], "Folder Key":[newFolderAddressKey], "Folder Address":[folderAddressList[newFolderAddressKey][15:]], "Has Z":["Yes"], "Date":[dateNow], "Time":[timeNow]}
-            dataToSend_dataFrom = pandas.DataFrame(dataToSend)
-            dataToSend_dataFrom.to_csv(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History.csv", mode="a", header=False, index=False)
+            #sending data to csv
+            dataToSend = {"Original Name":[fileName], "New Name":[newFileName], "Folder Key":[newFolderAddressKey], "Folder Address":[newAddress[16:]], "Has Z":["Yes"], "Date":[dateNow], "Time":[timeNow]}
+            dataToSend_dataFrame = pandas.DataFrame(dataToSend)
+            dataToSend_dataFrame.to_csv(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History - 1.csv", mode="a", encoding="utf-8", header=False, index=False)
+
+        else:
+            fileExtension = fileName.rsplit(".")[-1]
+            newFileName = cmdList_values[cmdListIndex] + " - (" + value_uniqueFileID + ")." + fileExtension
+            newFolderAddressKey = cmdList_keys[cmdListIndex]
+            newAddress = keysIn_folderAddressList[newFolderAddressKey]
+            #copying and renaming the files
+            shutil.copy(os.path.join(path_masterFolder, fileName), os.path.join(newAddress, newFileName))
+            #sending data to csv
+            dataToSend = {"Original Name":[fileName], "New Name":[newFileName], "Folder Key":[newFolderAddressKey], "Folder Address":[newAddress[16:]], "Has Z":["No"], "Date":[dateNow], "Time":[timeNow]}
+            dataToSend_dataFrame = pandas.DataFrame(dataToSend)
+            dataToSend_dataFrame.to_csv(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History - 1.csv", mode="a", encoding="utf-8", header=False, index=False)
+
+### ### ###
 
 #main function
 if __name__ == "__main__":
     #starting
     addFilesTo_filesInMasterFolder()
     allWindowSetup(filesInMasterFolder[0])
-    lastProgramSafety_value = readAndWriteTo_programSafety(0)
-    uniqueFileId_value = readUniqueFileId()
-    print(fullHelp_statement)
-    updateUniqueFileId_ifBad(lastProgramSafety_value)
-    getDbSize()
-    
+    value_lastProgramSafety = readAndWriteTo_programSafety(0)
+    value_uniqueFileID = readUniqueFileId()
+    uniqueFileID_repair(value_lastProgramSafety)
+    database_repair()
+    print(introStatement)
+
     #main function of the main function
-    for fileName in filesInMasterFolder:
-        renameFile_getCommand(fileName)
-    
+    for index in range(len(filesInMasterFolder)):
+        copyRenamedFile(index)
+
     #ending
     readAndWriteTo_programSafety(1)
+    closeImageWindow(filesInMasterFolder[-1])
     input("Finished. Press enter to exit.")
-    pyautogui.moveTo(1282, 22)
-    pyautogui.click()
 
 #the end
