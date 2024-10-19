@@ -81,6 +81,7 @@ Start with '{BRIGHT_RED}/ & Enter{RESET}' for R images.
 {BRIGHT_RED}1{RESET}0 : 2 Objects    | b
 {BRIGHT_RED}2{RESET}0 : 3 Objects    | b
 Face #: {BRIGHT_RED}E{RESET}yes {BRIGHT_RED}H{RESET}air {BRIGHT_RED}C{RESET}olour {BRIGHT_RED}S{RESET}tyle.
+DEL a b: delete
 
 {BRIGHT_RED}30{RESET} : Grade A      | v
 {BRIGHT_RED}31{RESET} : Grade B      | v
@@ -207,6 +208,17 @@ def characterUpdater(character):
     return character
 
 #defs
+def updateAllFileNames():
+    global path_masterFolder
+    fileValue = 0
+    for fileName in os.listdir(path_masterFolder):
+        if os.path.isfile(os.path.join(path_masterFolder, fileName)):
+            fileExtension = fileName.rsplit(".")
+            fileExtension = fileExtension[-1]
+            fileValue+=1
+            newFileName = str(fileValue) + "." + fileExtension
+            os.rename(os.path.join(path_masterFolder, fileName), os.path.join(path_masterFolder, newFileName))
+
 def addFilesTo_filesInMasterFolder():
     global path_masterFolder
     global filesInMasterFolder
@@ -220,11 +232,11 @@ def allWindowSetup(imageWindow):
     global path_masterFolder
     windowSetup_windowSnap(r"C:\Users\vinee\AppData\Local\Programs\Python\Launcher\py.exe", "right")
     time.sleep(0.5)
-    subprocess.run(['start', os.path.join(path_masterFolder, imageWindow)], shell=True)
+    subprocess.run(['start', '', os.path.join(path_masterFolder, imageWindow)], shell=True)
     time.sleep(0.5)
     windowSetup_windowSnap(imageWindow, "left")
     windowSetup_windowSnapReposition()
-    
+
 def windowSetup_windowSnap(windowName, position):
     windowObject = pygetwindow.getWindowsWithTitle(windowName)
     if windowObject:
@@ -239,7 +251,7 @@ def windowSetup_windowSnap(windowName, position):
         windowSetup_windowSnap(windowName, position)
 
 def windowSetup_windowSnapReposition():
-    pyautogui.moveTo(957, 509)
+    pyautogui.moveTo(960, 509)
     time.sleep(0.5)
     pyautogui.mouseDown()
     pyautogui.moveTo(1600, 509, duration=0.5)
@@ -249,6 +261,7 @@ def windowSetup_windowSnapReposition():
     windowObject[0].activate()
 
 def gotoNextImage(index):
+    global filesInMasterFolder
     windowObject = pygetwindow.getWindowsWithTitle(filesInMasterFolder[index])
     windowObject[0].activate()
     pyautogui.press('right')
@@ -287,12 +300,36 @@ def uniqueFileID_repair(value):
         value_uniqueFileID+=100
         writeToUniqueFileId(value_uniqueFileID)
 
+
+
+
 def database_repair():
     dbSize = os.path.getsize(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History - 1.csv")
-    if dbSize > 50000000:
-        os.remove(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History - 2.csv")
-        os.rename(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History - 1.csv", r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History - 2.csv")
-        shutil.copy(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\Sample.csv", r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History - 1.csv")
+    if dbSize > 100000:
+        #os.remove(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History - 2.csv")
+        #os.rename(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History - 1.csv", r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History - 2.csv")
+        #shutil.copy(r"E:\Code\Laptop Code\Ashen Silver Manager\Database\Sample.csv", r"E:\Code\Laptop Code\Ashen Silver Manager\Database\User's Command History - 1.csv")
+
+        activeCsvPath = 
+        inactiveCsvPath = 
+        activeCsv = 
+        sampleCsv = 
+        shutil.move(os.path.join(activeCsvPath, activeCsv), os.path.join(inactiveCsvPath, activeCsv))
+        shutil.copy(os.path.join(activeCsvPath, sampleCsv), os.path.join(activeCsvPath, activeCsv))
+        
+        if getFolderSize()>:
+
+
+
+
+
+def getFolderSize(folderPath):
+    folderSize = 0
+    for varA, varB, fileNames in os.walk(folderPath):
+        for fileName in fileNames:
+            filePath = os.path.join(varA, fileName)
+            folderSize += os.path.getsize(filePath)
+    return folderSize
 
 #defs
 def copyRenamedFile(fileIndex):
@@ -304,7 +341,7 @@ def copyRenamedFile(fileIndex):
     #base setup
     #1
     isR = False
-    inputIndex = 0
+    inputIndex = -1
     cmdList_keys = []
     cmdList_values = []
 
@@ -325,6 +362,9 @@ def copyRenamedFile(fileIndex):
         p()
     print(helpStatement)
 
+    print(filesInMasterFolder[fileIndex])
+    p()
+
     #input
     while True:
         
@@ -344,17 +384,36 @@ def copyRenamedFile(fileIndex):
             break
         if cmd == "/":
             isR = True
+            continue
+
+        thisState = True
+        if len(cmd)>3:
+            if cmd[0:3].upper == "DEL":
+                delete_cmd = cmd.split(" ")
+                delete_cmd.pop(0)
+                for dceIndex in range(len(delete_cmd)):
+                    if delete_cmd[dceIndex] not in cmdList_keys:
+                        print(f"'{delete_cmd[dceIndex]}' was not found. Retry.\n")
+                        thisState = False
+                        break
+                if thisState:
+                    for dceIndex in range(len(delete_cmd)):
+                        thisValue = int(delete_cmd[dceIndex])
+                        cmdList_values.pop(thisValue)
+                        cmdList_keys.pop(thisValue)
+                else:
+                    continue                        
+                        
         if len(cmd)<2:
             print(f"'{cmd}' is too short. Retry")
+            p()
             continue
         elementKey = cmd[0:2]
         if elementKey not in keysIn_folderAddressList:
             print(f"'{elementKey}' is not a valid key. Retry.")
+            p()
             continue
         elementValue = cmd[2:].strip()
-        
-        #goto next image
-        gotoNextImage()
         
         #updating invalid file names
         #part 1
@@ -362,6 +421,8 @@ def copyRenamedFile(fileIndex):
             elementValue = elementValue + "_"
         #part 2
         stringAsList = list(elementValue)
+        if stringAsList:
+            stringAsList[0] = stringAsList[0].upper()
         for characterIndex in range(len(stringAsList)):
             stringAsList[characterIndex] = characterUpdater(stringAsList[characterIndex])
         elementValue = "".join(stringAsList)
@@ -372,6 +433,9 @@ def copyRenamedFile(fileIndex):
             cmdList_keys.append(elementKey + "R")
         else:
             cmdList_keys.append(elementKey)
+    
+    #goto next image
+    gotoNextImage(fileIndex)
     
     #updating the lists
     addToTheGreatLibrary = True
@@ -399,7 +463,6 @@ def copyRenamedFile(fileIndex):
 
         if len(cmdList_values[cmdListIndex]) > 200 :
             fileExtension = fileName.rsplit(".")[-1]
-            newFileName = cmdList_values[cmdListIndex] + " - (" + value_uniqueFileID + ")." + fileExtension
             newFileName = "Z as [" + cmdList_values[cmdListIndex][190] + "]..." + " - (" + value_uniqueFileID + ")." + fileExtension
             newFileName_forText = "Z as [" + cmdList_values[cmdListIndex][190] + "]..." + " - (" + value_uniqueFileID + ").txt"
             newFolderAddressKey = cmdList_keys[cmdListIndex]
@@ -417,9 +480,9 @@ def copyRenamedFile(fileIndex):
 
         else:
             fileExtension = fileName.rsplit(".")[-1]
-            newFileName = cmdList_values[cmdListIndex] + " - (" + value_uniqueFileID + ")." + fileExtension
+            newFileName = cmdList_values[cmdListIndex] + " - (" + str(value_uniqueFileID) + ")." + fileExtension
             newFolderAddressKey = cmdList_keys[cmdListIndex]
-            newAddress = keysIn_folderAddressList[newFolderAddressKey]
+            newAddress = folderAddressList[newFolderAddressKey]
             #copying and renaming the files
             shutil.copy(os.path.join(path_masterFolder, fileName), os.path.join(newAddress, newFileName))
             #sending data to csv
@@ -432,6 +495,8 @@ def copyRenamedFile(fileIndex):
 #main function
 if __name__ == "__main__":
     #starting
+    updateAllFileNames()
+    time.sleep(0.1)
     addFilesTo_filesInMasterFolder()
     allWindowSetup(filesInMasterFolder[0])
     value_lastProgramSafety = readAndWriteTo_programSafety(0)
