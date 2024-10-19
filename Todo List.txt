@@ -1,0 +1,39 @@
+        (> = Checked, else Unchecked)
+
+        Features:
+    Per program (opening):
+Opens the first image; puts the image and the CLI side by side; resizes both windows. (3)
+Renames all files in the master folder
+Prints the "per program" print statement
+Sets safety to 0
+If last safety == 0, then increments ID by 100 and saves it
+If the active csv file is too large, it removes one csv file
+
+    Per image:
+Prints the "per image" print statement
+Prints the image file's name
+Accepts user input in green and blue colours, alternatively
+Asks for a retry for short input keys
+Asks for a retry for invalid input keys
+Can delete multiple entries of the active image using "del a b c..."
+If an input == /, then all copies are moved to the R folders
+Adds all images to the great library by default; except if they have recheck/del tags. (2)
+Can change illegal chars in file names to legal chars
+Can correct illegal file names
+Strips the new file name
+Sentence cases the new file name
+Updates ID in program and text file per rename (in per image)
+Copies renamed file to each of the up
+Sends history to the csv file
+If file name > 200 chars, adds a txt file with the full file name
+Can copy the renamed file to 76 (75) folders
+Moves to the next image automatically
+
+    Per program (closing):
+Closes the image window after all images have been copied
+Sets safety to 1
+
+        Todo:
+Check if file already exists; if yes, then recursively update ID until no similar file exists
+Add more csv files to counter the capacity loss by decrease in per csv file size
+FINAL: Test all untested features
